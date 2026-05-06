@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebBox Manager - 次世代ブラウザ・エミュレータ</title>
+    <meta name="description" content="ブラウザ上で動作する高性能仮想マシンマネージャー。WebAssembly技術によりインストール不要でOSを実行。">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+    <div id="app" class="glass-container">
+        <!-- サイドバー: VMリスト -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="box" class="logo-icon"></i>
+                    <span>WebBox</span>
+                </div>
+                <button id="btn-new-vm" class="icon-button" title="新規仮想マシン">
+                    <i data-lucide="plus"></i>
+                </button>
+            </div>
+            
+            <nav class="vm-list-container">
+                <div class="list-section">
+                    <span class="section-title">仮想マシン</span>
+                    <ul id="vm-list">
+                        <li class="vm-item active" data-id="ubuntu">
+                            <i data-lucide="terminal" class="vm-icon ubuntu"></i>
+                            <div class="vm-info">
+                                <span class="vm-name">Ubuntu 22.04 LTS</span>
+                                <span class="vm-status running">実行中</span>
+                            </div>
+                        </li>
+                        <li class="vm-item" data-id="cloudpc">
+                            <i data-lucide="cloud" class="vm-icon windows"></i>
+                            <div class="vm-info">
+                                <span class="vm-name">Cloud Desktop (Native)</span>
+                                <div class="vm-status-row">
+                                    <span class="vm-status powered-off">電源オフ</span>
+                                    <span class="badge high-speed">High Speed</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="vm-item" data-id="kali">
+                            <i data-lucide="shield" class="vm-icon kali"></i>
+                            <div class="vm-info">
+                                <span class="vm-name">Kali Linux</span>
+                                <span class="vm-status saved">中断</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="admin-panel-link" id="btn-admin-panel" style="margin-bottom: 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--accent-primary); font-size: 0.8rem; font-weight: 600;">
+                    <i data-lucide="server"></i>
+                    <span>Cloud Engine Admin</span>
+                </div>
+                <div class="host-stats">
+                    <div class="stat-item">
+                        <span>CPU</span>
+                        <div class="stat-bar"><div class="progress" style="width: 24%"></div></div>
+                    </div>
+                    <div class="stat-item">
+                        <span>RAM</span>
+                        <div class="stat-bar"><div class="progress" style="width: 42%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- メインコンテンツ: 詳細パネル -->
+        <main class="main-content">
+            <header class="toolbar">
+                <div class="vm-actions">
+                    <button id="btn-start" class="action-button primary">
+                        <i data-lucide="play"></i>
+                        <span>起動</span>
+                    </button>
+                    <button class="action-button">
+                        <i data-lucide="settings"></i>
+                        <span>設定</span>
+                    </button>
+                    <button class="action-button">
+                        <i data-lucide="camera"></i>
+                        <span>スナップショット</span>
+                    </button>
+                    <div class="divider"></div>
+                    <button class="action-button danger">
+                        <i data-lucide="power"></i>
+                        <span>停止</span>
+                    </button>
+                </div>
+                <div class="view-options">
+                    <button class="icon-button"><i data-lucide="monitor"></i></button>
+                    <button class="icon-button"><i data-lucide="list"></i></button>
+                </div>
+            </header>
+
+            <section id="vm-details" class="details-panel">
+                <div class="details-header">
+                    <div class="vm-preview">
+                        <div class="preview-overlay">
+                            <i data-lucide="monitor"></i>
+                            <span>クリックしてセッションを表示</span>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&q=80&w=800" alt="VM Preview" id="vm-preview-img">
+                    </div>
+                    <div class="vm-summary">
+                        <h1 id="detail-name">Cloud Desktop (Native)</h1>
+                        <p class="vm-desc">KVM不要でColabのフルスペックを使用する爆速デスクトップ環境。</p>
+                        <div class="tags">
+                            <span class="tag">Linux/XFCE</span>
+                            <span class="tag">64-bit</span>
+                            <span class="tag accent">Native Speed</span>
+                            <span class="tag accent">noVNC Streaming</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <h3><i data-lucide="cpu"></i> システム</h3>
+                        <ul>
+                            <li><strong>ベースメモリー:</strong> <span id="spec-ram">4096 MB</span></li>
+                            <li><strong>プロセッサー:</strong> <span id="spec-cpu">4 Cores</span></li>
+                            <li><strong>アクセラレーション:</strong> KVM/WasmGCI</li>
+                        </ul>
+                    </div>
+                    <div class="detail-card storage">
+                        <h3><i data-lucide="hard-drive"></i> ストレージ</h3>
+                        <ul class="spec-list">
+                            <li><strong>メインディスク:</strong> <span id="spec-disk">win11.vhd (64 GB)</span></li>
+                            <li><strong>光学ドライブ:</strong> <span id="spec-iso">Empty</span></li>
+                        </ul>
+                        <div class="card-actions">
+                            <input type="file" id="file-upload" accept=".iso,.vhd" style="display: none;">
+                            <button class="small-button" id="btn-upload"><i data-lucide="upload"></i> イメージを送信</button>
+                            <button class="small-button" id="btn-save-drive" style="color: var(--accent-success); border-color: var(--accent-success);"><i data-lucide="cloud"></i> Driveに保存</button>
+                            <button class="small-button" id="btn-download"><i data-lucide="download"></i> PCに保存</button>
+                        </div>
+                        <div id="upload-progress-container" class="hidden" style="margin-top: 12px;">
+                            <span style="font-size: 0.7rem; color: var(--text-muted);" id="upload-status">Uploading... 0%</span>
+                            <div class="stat-bar"><div class="progress" id="upload-bar" style="width: 0%; background: var(--accent-success);"></div></div>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <h3><i data-lucide="globe"></i> ネットワーク</h3>
+                        <ul>
+                            <li><strong>アダプター 1:</strong> NAT (WebSocket Proxy)</li>
+                            <li><strong>MACアドレス:</strong> 08:00:27:XX:XX:XX</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 仮想マシンセッション・オーバーレイ -->
+    <div id="vm-session-overlay" class="hidden">
+        <div class="session-header">
+            <div class="session-title">
+                <i data-lucide="terminal"></i>
+                <span id="active-session-name">Ubuntu 22.04 LTS</span>
+            </div>
+            <div class="session-controls">
+                <button id="btn-pip" title="ピクチャー・イン・ピクチャー"><i data-lucide="external-link"></i></button>
+                <button id="btn-fullscreen" title="フルスクリーン"><i data-lucide="maximize"></i></button>
+                <button id="btn-close-session" title="閉じる"><i data-lucide="x"></i></button>
+            </div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="vm-canvas"></canvas>
+            <video id="vm-video" autoplay playsinline muted></video>
+            <!-- Native Cloud Desktop用のIframe -->
+            <iframe id="vm-iframe" src="" frameborder="0"></iframe>
+            
+            <div id="boot-loader" class="hidden">
+                <div class="spinner"></div>
+                <span>Booting Kernel...</span>
+            </div>
+        </div>
+        <div class="session-footer">
+            <div class="indicators">
+                <i data-lucide="hard-drive" class="indicator" id="ind-disk" title="Disk Activity"></i>
+                <i data-lucide="network" class="indicator" id="ind-net" title="Network Activity"></i>
+                <i data-lucide="usb" class="indicator" id="ind-usb" title="USB Device Attached"></i>
+            </div>
+            <div class="status-msg">Running via v86 Wasm Engine</div>
+        </div>
+    </div>
+
+    <!-- 新規VMウィザード (モーダル) -->
+    <div id="modal-new-vm" class="modal hidden">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>新規仮想マシンの作成</h2>
+                <button class="btn-close-modal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>名前</label>
+                    <input type="text" placeholder="My New VM" id="input-vm-name">
+                </div>
+                <div class="form-group">
+                    <label>OSタイプ</label>
+                    <select>
+                        <option>Linux</option>
+                        <option>Windows</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="wizard-steps">
+                    <div class="step active">1. 基本設定</div>
+                    <div class="step">2. メモリー</div>
+                    <div class="step">3. 仮想ディスク</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary">キャンセル</button>
+                <button class="btn-primary">次へ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- クラウドエンジン管理者パネル (モーダル) -->
+    <div id="modal-admin" class="modal hidden">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2 style="display: flex; align-items: center; gap: 8px; color: var(--accent-primary);"><i data-lucide="server"></i> Cloud Engine Admin</h2>
+                <button class="btn-close-admin" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 24px;">リモートのGoogle Colabサーバー（ストリーミングエンジン）を管理します。</p>
+                
+                <div class="admin-actions" style="display: flex; flex-direction: column; gap: 12px;">
+                    <button class="action-button primary" id="btn-admin-save" style="justify-content: center;">
+                        <i data-lucide="cloud-upload"></i> 全ての変更をGoogle Driveに同期
+                    </button>
+                    
+                    <a href="https://colab.research.google.com/" target="_blank" class="action-button" style="justify-content: center; text-decoration: none;">
+                        <i data-lucide="external-link"></i> Colabノートブックを開く
+                    </a>
+                    
+                    <div class="divider" style="width: 100%; height: 1px; margin: 12px 0;"></div>
+                    
+                    <button class="action-button danger" id="btn-admin-shutdown" style="justify-content: center;">
+                        <i data-lucide="power"></i> サーバーをリモートでシャットダウン
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="core/webrtc.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
