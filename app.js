@@ -270,10 +270,14 @@ function openSession(id, autoConnect = false) {
                 simulateActivity();
                 
                 if (activeTunnelUrl) {
-                    // IframeにnoVNCのURLをセットして表示
-                    console.log('Connecting via iframe to:', activeTunnelUrl);
+                    // [修正] noVNCのメインページを指定し、自動接続とリサイズを有効にする
+                    let vncUrl = activeTunnelUrl;
+                    if (!vncUrl.endsWith('/')) vncUrl += '/';
+                    vncUrl += 'vnc.html?autoconnect=1&resize=scale';
+                    
+                    console.log('Connecting via iframe to:', vncUrl);
                     videoEl.classList.remove('active');
-                    iframeEl.src = activeTunnelUrl;
+                    iframeEl.src = vncUrl;
                     iframeEl.classList.add('active');
                 } else {
                     statusMsg.textContent = 'Connection Cancelled.';
