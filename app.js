@@ -240,6 +240,16 @@ function openSession(id, autoConnect = false) {
     const statusMsg = document.querySelector('.status-msg');
 
     if (id === 'cloudpc') {
+        // [修正] クリック直後（同期処理）にURLを聞くことで、バックグラウンドタブでのブロックを防ぐ
+        if (!autoConnect) {
+            const inputUrl = prompt("Google Colabで発行された Cloudflare Tunnel のURLを入力してください。\n(例: https://xxxx-xxxx.trycloudflare.com)", activeTunnelUrl);
+            if (!inputUrl) {
+                // キャンセルされた場合は起動処理を中止
+                return;
+            }
+            activeTunnelUrl = inputUrl;
+        }
+
         statusMsg.textContent = 'Connecting to Native Cloud Engine...';
         statusMsg.style.color = '#f59e0b';
         
@@ -258,10 +268,6 @@ function openSession(id, autoConnect = false) {
                 statusMsg.style.color = '#10b981';
                 selectVm(id);
                 simulateActivity();
-                
-                if (!autoConnect) {
-                    activeTunnelUrl = prompt("Google Colabで発行された Cloudflare Tunnel のURLを入力してください。\n(例: https://xxxx-xxxx.trycloudflare.com)", activeTunnelUrl);
-                }
                 
                 if (activeTunnelUrl) {
                     // IframeにnoVNCのURLをセットして表示
