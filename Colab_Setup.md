@@ -57,9 +57,18 @@ os.system("chmod 600 ~/.vnc/passwd")
 print("Starting Desktop Server...")
 os.system("vncserver :1 -geometry 1280x720 -depth 24 -localhost no -SecurityTypes VncAuth")
 
-# noVNCブリッジとCloudflareトンネルの起動 (バックグラウンド実行)
-print("Starting Web Streamer and Cloudflare Tunnel...")
-os.system("nohup /usr/local/bin/websockify --web /usr/share/novnc 6080 localhost:5901 > websockify.log 2>&1 &")
+# noVNCブリッジのパスを検索
+import shutil
+websockify_bin = shutil.which("websockify") or "/usr/local/bin/websockify"
+
+# サーバー起動 (バックグラウンド実行)
+print("Starting Web Streamer (websockify)...")
+os.system(f"nohup {websockify_bin} --web /usr/share/novnc 6080 localhost:5901 > websockify.log 2>&1 &")
+
+# websockifyが起動するまで数秒待機（ポート6080が開くのを待つ）
+time.sleep(5)
+
+print("Starting Cloudflare Tunnel...")
 os.system("nohup /usr/local/bin/cloudflared tunnel --url http://localhost:6080 > cloudflared.log 2>&1 &")
 
 print("==================================================================")
