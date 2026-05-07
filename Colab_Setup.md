@@ -120,7 +120,12 @@ print("Starting KasmVNC Server...")
 os.system("kasmvncserver -kill :1 > /dev/null 2>&1")
 os.system("rm -rf /tmp/.X11-unix/X1 /tmp/.X1-lock cloudflared.log")
 os.environ["LANG"] = "ja_JP.UTF-8"
-os.system("kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce")
+
+# サーバーをバックグラウンドで起動 (パスワード入力をバイパス)
+os.system("nohup kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password > kasmvnc.log 2>&1 &")
+
+# サーバーが立ち上がるまで少し待機
+time.sleep(5)
 
 # IMEとオーディオの起動
 os.system("DISPLAY=:1 fcitx5 -d > /dev/null 2>&1")
