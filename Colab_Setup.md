@@ -116,25 +116,29 @@ def auto_backup():
 threading.Thread(target=auto_backup, daemon=True).start()
 
 # 4. KasmVNCサーバーの起動
+import subprocess
+
 print("Starting KasmVNC Server...")
 os.system("kasmvncserver -kill :1 > /dev/null 2>&1")
 os.system("rm -rf /tmp/.X11-unix/X1 /tmp/.X1-lock cloudflared.log")
 os.environ["LANG"] = "ja_JP.UTF-8"
 
-# サーバーをバックグラウンドで起動 (パスワード入力をバイパス)
-os.system("nohup kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password > kasmvnc.log 2>&1 &")
+# サーバーを確実にバックグラウンドで起動
+cmd = "kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password"
+subprocess.Popen(cmd.split(), stdout=open("kasmvnc.log", "w"), stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
 
 # サーバーが立ち上がるまで少し待機
 time.sleep(5)
 
 # IMEとオーディオの起動
+print("Starting Input Method & Audio...")
 os.system("DISPLAY=:1 fcitx5 -d > /dev/null 2>&1")
 os.system("pulseaudio --start --exit-idle-time=-1 > /dev/null 2>&1")
 os.system("autocutsel -fork")
 
 # クラウドフレアトンネル起動
 print("Starting Cloudflare Tunnel...")
-os.system("nohup /usr/local/bin/cloudflared tunnel --url http://localhost:8444 > cloudflared.log 2>&1 &")
+subprocess.Popen(["/usr/local/bin/cloudflared", "tunnel", "--url", "http://localhost:8444"], stdout=open("cloudflared.log", "w"), stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
 
 print("==================================================================")
 print("⏳ トンネルのURLを生成中...")
