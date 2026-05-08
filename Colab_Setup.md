@@ -123,12 +123,18 @@ os.system("kasmvncserver -kill :1 > /dev/null 2>&1")
 os.system("rm -rf /tmp/.X11-unix/X1 /tmp/.X1-lock cloudflared.log")
 os.environ["LANG"] = "ja_JP.UTF-8"
 
-# サーバーを確実にバックグラウンドで起動
-cmd = "kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password"
+# 設定ファイルを強制適用し、SSLなしで起動
+cmd = "kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl"
 subprocess.Popen(cmd.split(), stdout=open("kasmvnc.log", "w"), stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
 
-# サーバーが立ち上がるまで少し待機
-time.sleep(5)
+# サーバーが立ち上がるまで待機し、ポートが開いているか確認
+print("Waiting for server to start...")
+time.sleep(8)
+
+# デバッグ用：ログの最後を表示
+with open("kasmvnc.log", "r") as f:
+    print("--- KasmVNC Log Summary ---")
+    print("".join(f.readlines()[-5:]))
 
 # IMEとオーディオの起動
 print("Starting Input Method & Audio...")
