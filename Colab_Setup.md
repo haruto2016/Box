@@ -125,11 +125,11 @@ os.system("kasmvncserver -kill :1 > /dev/null 2>&1")
 os.system("rm -rf /tmp/.X11-unix/X1 /tmp/.X1-lock cloudflared.log")
 os.environ["LANG"] = "ja_JP.UTF-8"
 
-# 設定ファイルを強制適用し、SSLなしで起動
-cmd = "kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl"
+# 127.0.0.1で待機するように設定
+cmd = "kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl --interface 127.0.0.1"
 subprocess.Popen(cmd.split(), stdout=open("kasmvnc.log", "w"), stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
 
-# サーバーが立ち上がるまで待機し、ポートが開いているか確認
+# サーバーが立ち上がるまで待機
 print("Waiting for server to start...")
 time.sleep(8)
 
@@ -144,9 +144,9 @@ os.system("DISPLAY=:1 fcitx5 -d > /dev/null 2>&1")
 os.system("pulseaudio --start --exit-idle-time=-1 > /dev/null 2>&1")
 os.system("autocutsel -fork")
 
-# クラウドフレアトンネル起動
+# クラウドフレアトンネル起動 (127.0.0.1を明示し、証明書エラーを無視)
 print("Starting Cloudflare Tunnel...")
-subprocess.Popen(["/usr/local/bin/cloudflared", "tunnel", "--url", "http://localhost:8444"], stdout=open("cloudflared.log", "w"), stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
+subprocess.Popen(["/usr/local/bin/cloudflared", "tunnel", "--url", "http://127.0.0.1:8444", "--no-tls-verify"], stdout=open("cloudflared.log", "w"), stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
 
 print("==================================================================")
 print("⏳ トンネルのURLを生成中...")
