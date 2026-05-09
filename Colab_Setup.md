@@ -143,8 +143,8 @@ os.system("pulseaudio --start --exit-idle-time=-1 > /dev/null 2>&1")
 os.system("autocutsel -fork")
 
 # Google Colab公式のプロキシ機能でURLを発行（組織の制限を100%回避）
-from google.colab import output
-proxy_url = output.proxy_port(8444)
+from google.colab.output import eval_js
+proxy_url = eval_js("google.colab.kernel.proxyPort(8444)")
 
 print("==================================================================")
 print("✅ 接続準備完了！ (Google Official Proxy Mode)")
