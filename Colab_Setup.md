@@ -128,13 +128,22 @@ os.environ["LANG"] = "ja_JP.UTF-8"
 # 設定をさらに緩和（Googleプロキシを通すため）
 !echo -e "version: 1\n\nnetwork:\n  protocol: http\n  port: 8444\n\n  ssl:\n    require_ssl: false\n\n  websocket:\n    allow_origin: '*'\n\nauth:\n  type: none\n\n" > ~/.vnc/kasmvnc.yaml
 
-# 127.0.0.1で待機するように設定
-cmd = "kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl --interface 127.0.0.1"
+# 0.0.0.0で待機するように設定
+cmd = "kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl --interface 0.0.0.0"
 subprocess.Popen(cmd.split(), stdout=open("kasmvnc.log", "w"), stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
 
 # サーバーが立ち上がるまで待機
-print("Waiting for server to start...")
-time.sleep(8)
+print("Waiting for KasmVNC to stabilize...")
+time.sleep(10)
+
+# ポートが開いているか確認
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+if s.connect_ex(('127.0.0.1', 8444)) == 0:
+    print("✅ Port 8444 is OPEN.")
+else:
+    print("❌ Port 8444 is CLOSED. Check kasmvnc.log below:")
+    with open("kasmvnc.log", "r") as f: print(f.read())
 
 # IMEとオーディオの起動
 print("Starting Input Method & Audio...")
@@ -142,7 +151,7 @@ os.system("DISPLAY=:1 fcitx5 -d > /dev/null 2>&1")
 os.system("pulseaudio --start --exit-idle-time=-1 > /dev/null 2>&1")
 os.system("autocutsel -fork")
 
-# Google Colab公式のプロキシ機能でURLを発行（組織の制限を100%回避）
+# Google Colab公式のプロキシ機能でURLを発行
 from google.colab.output import eval_js
 proxy_url = eval_js("google.colab.kernel.proxyPort(8444)")
 
