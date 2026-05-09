@@ -1,4 +1,5 @@
 // WebBox Manager - Frontend Logic
+console.log("WebBox v3 Loaded - KasmVNC Mode");
 
 const vms = {
     ubuntu: {
@@ -270,10 +271,8 @@ function openSession(id, autoConnect = false) {
                 simulateActivity();
                 
                 if (activeTunnelUrl) {
-                    // [修正] noVNCのメインページを指定し、自動接続とリサイズを有効にする
+                    // [修正] KasmVNCはルートURLで直接動作するため、パスの付加を削除
                     let vncUrl = activeTunnelUrl;
-                    if (!vncUrl.endsWith('/')) vncUrl += '/';
-                    vncUrl += 'vnc.html?autoconnect=1&resize=scale';
                     
                     console.log('Connecting via iframe to:', vncUrl);
                     videoEl.classList.remove('active');
