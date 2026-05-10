@@ -13,6 +13,7 @@ Kaggle の強力な環境（RAM 13GB / 12時間連続稼働）をフル活用し
 ## 手順 1: デスクトップ環境のインストール
 最初のセルに以下のコードを貼り付けて実行します。（約3〜5分かかります）
 
+{% raw %}
 ```bash
 # セル 1: インストール（Kaggle対応版）
 !echo "Installing Desktop Environment..."
@@ -53,6 +54,7 @@ with open(os.path.expanduser("~/.config/rclone/rclone.conf"), "w") as f:
 
 !echo "✅ Installation Complete! (Kaggle Mode)"
 ```
+{% endraw %}
 
 ## 手順 2: サーバー起動＆データ同期
 次のセルに以下のコードを貼り付けて実行します。
