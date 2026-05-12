@@ -84,24 +84,37 @@ type = drive
 scope = drive
 token = {\"refresh_token\":\"$REFRESH_TOKEN\"}" > ~/.config/rclone/rclone.conf
 
-# KasmVNCのユーザーを非対話的に作成 (パスワード: webbox123)
+# SSL証明書の自己署名作成 (KasmVNCの起動エラー回避用)
 mkdir -p ~/.vnc
-touch ~/.Xauthority
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout ~/.vnc/self.key -out ~/.vnc/self.cert \
+    -subj "/C=JP/ST=Tokyo/L=WebBox/CN=localhost"
+
+# KasmVNCのユーザーパスワード設定
 (echo "webbox123"; echo "webbox123") | kasmvncpasswd -u user
+
+# KasmVNC 1.3.1 用の正しい設定ファイル作成
+echo "
+network:
+  http_port: 8444
+  ssl:
+    require_ssl: false
+    cert_path: /home/user/.vnc/self.cert
+    key_path: /home/user/.vnc/self.key
+auth:
+  method: none
+users:
+  user:
+    password: \"\"
+    permissions:
+      - allow_all
+" > ~/.vnc/kasmvnc.yaml
 
 # 日本語設定
 export LANG=ja_JP.UTF-8
 
-# KasmVNC起動 (設定ファイルを使わず、すべてコマンドライン引数で指定)
-printf "1\n" | kasmvncserver :1 \
-    -geometry 1280x720 \
-    -depth 24 \
-    -select-de xfce \
-    --http-port 8444 \
-    --interface 0.0.0.0 \
-    --disable-ssl \
-    --no-password \
-    --websocket-port 8445
+# KasmVNC起動 (設定ファイルを指定して起動)
+kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --interface 0.0.0.0
 ```
 
 ---
