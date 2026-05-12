@@ -22,9 +22,9 @@ export XDG_RUNTIME_DIR=/tmp/runtime-user
 mkdir -p "$XDG_RUNTIME_DIR"
 
 # ---- 4. Create KasmVNC User ----
-# printfを使用して改行文字を確実に制御（パスワード不一致を防ぐ）
-printf "password\npassword\n" | kasmvncpasswd -u user -w
-echo "[OK] Created KasmVNC user 'user'"
+PASSWD_FILE="$HOME/.kasmpasswd"
+printf "password\npassword\n" | kasmvncpasswd -u user -w "$PASSWD_FILE"
+echo "[OK] Created KasmVNC user 'user' in $PASSWD_FILE"
 
 # ---- 5. KasmVNC Config ----
 cat > "$HOME/.vnc/kasmvnc.yaml" <<'YAML'
@@ -52,7 +52,6 @@ exec kasmvncserver :1 \
     -depth 24 \
     -websocketPort 7860 \
     -interface 0.0.0.0 \
-    -disableBasicAuth \
     -cert "$HOME/.vnc/self.cert" \
     -key "$HOME/.vnc/self.key" \
     -select-de xfce \
