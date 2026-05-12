@@ -36,6 +36,9 @@ RUN apt-get update && apt-get install -y \
     fcitx5-mozc dbus-x11 pulseaudio sudo rclone \
     && apt-get clean
 
+# KasmVNCのグループ作成とユーザー追加
+RUN groupadd kasmvnc
+
 # KasmVNCのインストール
 RUN wget -q https://github.com/kasmtech/KasmVNC/releases/download/v1.3.1/kasmvncserver_jammy_1.3.1_amd64.deb \
     && apt-get install -y ./kasmvncserver_jammy_1.3.1_amd64.deb \
@@ -47,7 +50,7 @@ RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd6
     && rm google-chrome-stable_current_amd64.deb
 
 # ユーザー設定
-RUN useradd -m -u 1000 user
+RUN useradd -m -u 1000 -G kasmvnc user
 ENV HOME=/home/user
 WORKDIR $HOME
 USER user
@@ -91,8 +94,8 @@ echo -e "version: 1\n\nnetwork:\n  protocol: http\n  port: 8444\n\n  ssl:\n    r
 # 日本語設定
 export LANG=ja_JP.UTF-8
 
-# KasmVNC起動 (ユーザー指定で対話プロンプトを回避)
-kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl --interface 0.0.0.0
+# KasmVNC起動 (プロンプトに対して自動で 1 を入力してバイパス)
+printf "1\n" | kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl --interface 0.0.0.0
 ```
 
 ---
