@@ -81,14 +81,17 @@ type = drive
 scope = drive
 token = {\"refresh_token\":\"$REFRESH_TOKEN\"}" > ~/.config/rclone/rclone.conf
 
-# VNCの設定
+# KasmVNCのユーザーを非対話的に作成 (パスワード: webbox123)
 mkdir -p ~/.vnc
-echo -e "version: 1\n\nnetwork:\n  protocol: http\n  port: 8444\n\n  ssl:\n    require_ssl: false\n\n  auth:\n    type: none\n\n" > ~/.vnc/kasmvnc.yaml
+(echo "webbox123"; echo "webbox123") | kasmvncpasswd -u user
+
+# VNCの設定 (書き込み権限を持つユーザーを指定)
+echo -e "version: 1\n\nnetwork:\n  protocol: http\n  port: 8444\n\n  ssl:\n    require_ssl: false\n\nauth:\n  type: none\n\n" > ~/.vnc/kasmvnc.yaml
 
 # 日本語設定
 export LANG=ja_JP.UTF-8
 
-# KasmVNC起動
+# KasmVNC起動 (ユーザー指定で対話プロンプトを回避)
 kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl --interface 0.0.0.0
 ```
 
