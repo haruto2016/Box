@@ -13,6 +13,7 @@ echo "[OK] SSL certificate"
 
 # ---- 2. Cleanup stale locks ----
 rm -f /tmp/.X1-lock /tmp/.X11-unix/X1 2>/dev/null || true
+rm -rf "$HOME/.kasmpasswd" 2>/dev/null || true
 
 # ---- 3. Environment ----
 export DISPLAY=:1
@@ -20,7 +21,11 @@ export LANG=ja_JP.UTF-8
 export XDG_RUNTIME_DIR=/tmp/runtime-user
 mkdir -p "$XDG_RUNTIME_DIR"
 
-# ---- 4. KasmVNC Config ----
+# ---- 4. Create KasmVNC User (Fixing the previous bug where it was a directory) ----
+echo -e "password\npassword" | kasmvncpasswd -u user -w
+echo "[OK] Created KasmVNC user 'user'"
+
+# ---- 5. KasmVNC Config ----
 cat > "$HOME/.vnc/kasmvnc.yaml" <<'YAML'
 network:
   protocol: http
@@ -38,16 +43,14 @@ desktop:
 YAML
 echo "[OK] KasmVNC config"
 
-# ---- 5. Start KasmVNC using the wrapper ----
+# ---- 6. Start KasmVNC using the wrapper ----
 echo "[START] Launching KasmVNC on :1 port 7860 ..."
 
-# 1の代わりに2を入力することで「権限ユーザーなし（=認証なし）」を選択
-echo "2" | kasmvncserver :1 \
+exec kasmvncserver :1 \
     -geometry 1280x720 \
     -depth 24 \
     -websocketPort 7860 \
     -interface 0.0.0.0 \
-    -disableBasicAuth \
     -cert "$HOME/.vnc/self.cert" \
     -key "$HOME/.vnc/self.key" \
     -select-de xfce \

@@ -116,7 +116,7 @@ btnStart.addEventListener('click', () => {
 });
 
 // Upload Logic
-let activeTunnelUrl = 'https://hotateproject-box.hf.space';
+let activeTunnelUrl = 'https://hotateproject-box.hf.space/?username=user&password=password';
 
 const btnUpload = document.getElementById('btn-upload');
 const btnDownload = document.getElementById('btn-download');
