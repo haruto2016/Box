@@ -86,16 +86,22 @@ token = {\"refresh_token\":\"$REFRESH_TOKEN\"}" > ~/.config/rclone/rclone.conf
 
 # KasmVNCのユーザーを非対話的に作成 (パスワード: webbox123)
 mkdir -p ~/.vnc
+touch ~/.Xauthority
 (echo "webbox123"; echo "webbox123") | kasmvncpasswd -u user
-
-# VNCの設定 (書き込み権限を持つユーザーを指定)
-echo -e "version: 1\n\nnetwork:\n  protocol: http\n  port: 8444\n\n  ssl:\n    require_ssl: false\n\nauth:\n  type: none\n\n" > ~/.vnc/kasmvnc.yaml
 
 # 日本語設定
 export LANG=ja_JP.UTF-8
 
-# KasmVNC起動 (プロンプトに対して自動で 1 を入力してバイパス)
-printf "1\n" | kasmvncserver :1 -geometry 1280x720 -depth 24 -select-de xfce --no-password --http-port 8444 --disable-ssl --interface 0.0.0.0
+# KasmVNC起動 (設定ファイルを使わず、すべてコマンドライン引数で指定)
+printf "1\n" | kasmvncserver :1 \
+    -geometry 1280x720 \
+    -depth 24 \
+    -select-de xfce \
+    --http-port 8444 \
+    --interface 0.0.0.0 \
+    --disable-ssl \
+    --no-password \
+    --websocket-port 8445
 ```
 
 ---
