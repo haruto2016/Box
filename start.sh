@@ -20,7 +20,25 @@ export LANG=ja_JP.UTF-8
 export XDG_RUNTIME_DIR=/tmp/runtime-user
 mkdir -p "$XDG_RUNTIME_DIR"
 
-# ---- 4. Start KasmVNC using the wrapper, passing "2" to bypass the user prompt ----
+# ---- 4. KasmVNC Config ----
+cat > "$HOME/.vnc/kasmvnc.yaml" <<'YAML'
+network:
+  protocol: http
+  interface: 0.0.0.0
+  websocket_port: 7860
+  ssl:
+    require_ssl: false
+    pem_certificate: /home/user/.vnc/self.cert
+    pem_key: /home/user/.vnc/self.key
+desktop:
+  resolution:
+    width: 1280
+    height: 720
+  allow_resize: true
+YAML
+echo "[OK] KasmVNC config"
+
+# ---- 5. Start KasmVNC using the wrapper ----
 echo "[START] Launching KasmVNC on :1 port 7860 ..."
 
 # 1の代わりに2を入力することで「権限ユーザーなし（=認証なし）」を選択
@@ -30,5 +48,7 @@ echo "2" | kasmvncserver :1 \
     -websocketPort 7860 \
     -interface 0.0.0.0 \
     -disableBasicAuth \
+    -cert "$HOME/.vnc/self.cert" \
+    -key "$HOME/.vnc/self.key" \
     -select-de xfce \
     -fg
