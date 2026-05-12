@@ -116,7 +116,7 @@ btnStart.addEventListener('click', () => {
 });
 
 // Upload Logic
-let activeTunnelUrl = '';
+let activeTunnelUrl = 'https://hotateproject-box.hf.space';
 
 const btnUpload = document.getElementById('btn-upload');
 const btnDownload = document.getElementById('btn-download');
@@ -139,10 +139,6 @@ btnCloseAdmin.addEventListener('click', () => modalAdmin.classList.add('hidden')
 
 // API Functions
 async function callColabApi(endpoint, successMsg) {
-    if (!activeTunnelUrl) {
-        activeTunnelUrl = prompt("ColabのTunnel URLを入力してください:");
-        if (!activeTunnelUrl) return;
-    }
     
     try {
         const response = await fetch(`${activeTunnelUrl}${endpoint}`, { method: 'POST' });
@@ -169,10 +165,6 @@ btnAdminShutdown.addEventListener('click', () => {
 });
 
 btnDownload.addEventListener('click', () => {
-    if (!activeTunnelUrl) {
-        activeTunnelUrl = prompt("ColabのTunnel URLを入力してください (ダウンロード元):");
-        if (!activeTunnelUrl) return;
-    }
     
     // バックエンドからPCへの直接ダウンロードを開始
     const downloadUrl = `${activeTunnelUrl}/api/download`;
@@ -180,10 +172,6 @@ btnDownload.addEventListener('click', () => {
 });
 
 btnUpload.addEventListener('click', () => {
-    if (!activeTunnelUrl) {
-        activeTunnelUrl = prompt("ColabのTunnel URLを入力してください (アップロード先):");
-        if (!activeTunnelUrl) return;
-    }
     fileInput.click();
 });
 
@@ -241,15 +229,6 @@ function openSession(id, autoConnect = false) {
     const statusMsg = document.querySelector('.status-msg');
 
     if (id === 'cloudpc') {
-        // [修正] クリック直後（同期処理）にURLを聞くことで、バックグラウンドタブでのブロックを防ぐ
-        if (!autoConnect) {
-            const inputUrl = prompt("Google Colabで発行された Cloudflare Tunnel のURLを入力してください。\n(例: https://xxxx-xxxx.trycloudflare.com)", activeTunnelUrl);
-            if (!inputUrl) {
-                // キャンセルされた場合は起動処理を中止
-                return;
-            }
-            activeTunnelUrl = inputUrl;
-        }
 
         statusMsg.textContent = 'Connecting to Native Cloud Engine...';
         statusMsg.style.color = '#f59e0b';
