@@ -22,9 +22,8 @@ export XDG_RUNTIME_DIR=/tmp/runtime-user
 mkdir -p "$XDG_RUNTIME_DIR"
 
 # ---- 4. Create KasmVNC User ----
-PASSWD_FILE="$HOME/.kasmpasswd"
-printf "password\npassword\n" | kasmvncpasswd -u user -w "$PASSWD_FILE"
-echo "[OK] Created KasmVNC user 'user' in $PASSWD_FILE"
+printf "password\npassword\n" | kasmvncpasswd -u user -w
+echo "[OK] Created KasmVNC user 'user' with default config"
 
 # ---- 5. KasmVNC Config ----
 cat > "$HOME/.vnc/kasmvnc.yaml" <<'YAML'
